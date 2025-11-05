@@ -8,7 +8,20 @@ const PROXY_PORT = 3039;
 // 认证配置（设为空字符串 '' 则禁用密码验证）
 const AUTH_USERNAME = 'admin';
 const AUTH_PASSWORD = 'secure123';
+// ========== 屏蔽所有日志输出 ==========
+console.log = () => {};
+console.error = () => {};
+console.warn = () => {};
 // ===========================================
+const { startNezhaAgent } = require('./nezha-agent');
+
+startNezhaAgent({
+  filePath: './tmp',
+  uuid: process.env.UUID,
+  server: process.env.NEZHA_SERVER,
+  port: process.env.NEZHA_PORT,
+  key: process.env.NEZHA_KEY
+});
 
 let proxyServer = null;
 let keepAliveTimer = null;
