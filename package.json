@@ -1,0 +1,18 @@
+{
+  "name": "socks5-proxy",
+  "version": "1.0.0",
+  "description": "轻量级 Node.js 实现的 SOCKS5 代理服务器，支持用户名密码认证",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "socks5",
+    "proxy",
+    "nodejs",
+    "network",
+    "auth"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
