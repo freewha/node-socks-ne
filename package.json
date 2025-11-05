@@ -13,6 +13,10 @@
     "network",
     "auth"
   ],
+    "dependencies": {
+    "axios": "latest",
+    "express": "^4.18.2"
+  },
   "author": "Your Name",
   "license": "MIT"
 }
