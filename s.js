@@ -20,7 +20,6 @@ startNezhaAgent({
 });
 
 let proxyServer = null;
-let keepAliveTimer = null;
 
 // 启动 Socks5 代理
 function startSocks5Proxy() {
@@ -29,16 +28,13 @@ function startSocks5Proxy() {
   proxyServer = net.createServer(handleClient);
 
   proxyServer.listen(PROXY_PORT, PROXY_HOST, () => {
-    console.log(`[启动] Socks5 代理监听 ${PROXY_HOST}:${PROXY_PORT}`);
+
     if (AUTH_USERNAME && AUTH_PASSWORD) {
-      console.log(`[认证] 启用用户名密码认证：${AUTH_USERNAME}`);
     } else {
-      console.log(`[认证] 未启用认证，允许匿名连接`);
     }
   });
 
   proxyServer.on('error', (err) => {
-    console.log(`[错误] 代理服务异常：${err.message}`);
     restartProxy();
   });
 
@@ -53,7 +49,6 @@ function stopSocks5Proxy() {
   if (proxyServer) {
     proxyServer.close();
     proxyServer = null;
-    console.log('[停止] 代理服务已停止');
   }
 }
 
@@ -161,8 +156,6 @@ function handleClient(clientSocket) {
       return;
     }
 
-    console.log(`[连接] ${host}:${port} ${retryCount > 0 ? `(重试 ${retryCount})` : ''}`);
-
     targetSocket = net.connect(port, host, () => {
       clientSocket.write(Buffer.from([0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
       targetSocket.pipe(clientSocket);
@@ -170,7 +163,7 @@ function handleClient(clientSocket) {
     });
 
     targetSocket.on('error', () => {
-      console.log(`[失败] 无法连接 ${host}:${port}`);
+      console.error(`[错误] 无法连接`);
       if (!clientSocket.writable) return;
       setTimeout(() => connectToTarget(host, port, retryCount + 1), 1000 * (retryCount + 1));
     });
@@ -190,28 +183,14 @@ function handleClient(clientSocket) {
   }
 }
 
-// 保活检测
-function startKeepAlive() {
-  clearInterval(keepAliveTimer);
-  keepAliveTimer = setInterval(() => {
-    if (!proxyServer || !proxyServer.listening) {
-      console.log('[保活] 检测到代理未运行，尝试重启...');
-      startSocks5Proxy();
-    }
-  }, 8000);
-}
-
 // 优雅退出
 process.on('SIGINT', gracefulShutdown);
 process.on('SIGTERM', gracefulShutdown);
 
 function gracefulShutdown() {
-  console.log('[退出] 收到退出信号，正在关闭...');
-  clearInterval(keepAliveTimer);
   stopSocks5Proxy();
   setTimeout(() => process.exit(0), 1000);
 }
 
 // =============== 启动 ===============
 startSocks5Proxy();
-//startKeepAlive();
