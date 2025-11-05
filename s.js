@@ -214,4 +214,4 @@ function gracefulShutdown() {
 
 // =============== 启动 ===============
 startSocks5Proxy();
-startKeepAlive();
+//startKeepAlive();
